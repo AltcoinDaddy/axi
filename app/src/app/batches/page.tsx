@@ -83,32 +83,32 @@ export default function BatchesPage() {
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Title */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2">
-              <Layers className="w-6 h-6 inline-block mr-2 text-[hsl(var(--axi-primary))]" />
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold mb-3 text-slate-800 dark:text-slate-100">
+              <Layers className="w-8 h-8 inline-block mr-2 text-slate-800 dark:text-slate-100" />
               Batch Explorer
             </h1>
-            <p className="text-sm text-[hsl(var(--axi-text-muted))]">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
               View executed batches — individual amounts are{" "}
-              <span className="text-[hsl(var(--axi-primary))] font-medium">
+              <span className="text-blue-500 font-bold">
                 never visible
               </span>
             </p>
           </div>
 
           {/* Privacy Notice */}
-          <div className="glass-card p-4 mb-6 border-[hsl(var(--axi-primary)/0.2)]">
+          <div className="bg-blue-50/50 dark:bg-blue-900/20 p-5 rounded-[2rem] border border-blue-100 dark:border-blue-800/50 shadow-sm mb-6">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-[hsl(var(--axi-primary)/0.1)] shrink-0">
-                <Shield className="w-5 h-5 text-[hsl(var(--axi-primary))]" />
+              <div className="p-2.5 rounded-2xl bg-blue-100/50 dark:bg-blue-900/50 shrink-0">
+                <Shield className="w-5 h-5 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm font-medium mb-1">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1.5">
                   Privacy Guarantee
                 </p>
-                <p className="text-xs text-[hsl(var(--axi-text-muted))] leading-relaxed">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                   This page shows real batch metadata fetched from Sepolia. Individual user amounts, strategies, and positions are{" "}
-                  <strong className="text-[hsl(var(--axi-primary))]">
+                  <strong className="text-blue-500 font-bold">
                     encrypted and never exposed
                   </strong>
                   .
@@ -119,115 +119,115 @@ export default function BatchesPage() {
 
           {/* Batch Stats */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="glass-card p-4 text-center">
-              <p className="text-2xl font-bold">{batches.length}</p>
-              <p className="text-xs text-[hsl(var(--axi-text-muted))]">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm text-center hover:shadow-md transition-shadow">
+              <p className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{batches.length}</p>
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider">
                 Total Batches
               </p>
             </div>
-            <div className="glass-card p-4 text-center">
-              <p className="text-2xl font-bold">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm text-center hover:shadow-md transition-shadow">
+              <p className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
                 {batches.reduce((sum, b) => sum + b.intentCount, 0)}
               </p>
-              <p className="text-xs text-[hsl(var(--axi-text-muted))]">
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider">
                 Intents Processed
               </p>
             </div>
-            <div className="glass-card p-4 text-center">
-              <p className="text-2xl font-bold text-[hsl(var(--axi-success))]">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm text-center hover:shadow-md transition-shadow">
+              <p className="text-3xl font-bold text-emerald-500 tracking-tight">
                 {batches.filter((b) => b.status === "executed").length}
               </p>
-              <p className="text-xs text-[hsl(var(--axi-text-muted))]">
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider">
                 Executed
               </p>
             </div>
           </div>
 
           {/* Batch Table */}
-          <div className="glass-card overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[hsl(var(--axi-border)/0.3)]">
-                    <th className="text-left px-6 py-4 text-xs font-medium text-[hsl(var(--axi-text-muted))] uppercase tracking-wider">
+                  <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                    <th className="text-left px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Batch ID
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-medium text-[hsl(var(--axi-text-muted))] uppercase tracking-wider">
+                    <th className="text-left px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Pair
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-medium text-[hsl(var(--axi-text-muted))] uppercase tracking-wider">
+                    <th className="text-left px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Intents
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-medium text-[hsl(var(--axi-text-muted))] uppercase tracking-wider">
+                    <th className="text-left px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Amounts
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-medium text-[hsl(var(--axi-text-muted))] uppercase tracking-wider">
+                    <th className="text-left px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-medium text-[hsl(var(--axi-text-muted))] uppercase tracking-wider">
+                    <th className="text-left px-8 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Time
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[hsl(var(--axi-border)/0.2)]">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-sm text-[hsl(var(--axi-text-muted))]">
+                      <td colSpan={6} className="px-8 py-10 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
                         Loading on-chain data from Sepolia...
                       </td>
                     </tr>
                   ) : batches.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-sm text-[hsl(var(--axi-text-muted))]">
+                      <td colSpan={6} className="px-8 py-10 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
                         No batches found on Sepolia yet. Submit intents to form a batch!
                       </td>
                     </tr>
                   ) : batches.map((batch) => (
                     <tr
                       key={batch.id}
-                      className="hover:bg-[hsl(var(--axi-bg-card)/0.5)] transition-colors"
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group"
                     >
-                      <td className="px-6 py-4">
-                        <span className="font-mono text-sm font-medium">
+                      <td className="px-8 py-5">
+                        <span className="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">
                           #{batch.id}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-medium">
+                      <td className="px-8 py-5">
+                        <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                           {batch.tokenIn}{" "}
-                          <span className="text-[hsl(var(--axi-text-muted))]">
+                          <span className="text-slate-400 dark:text-slate-500 px-1">
                             →
                           </span>{" "}
                           {batch.tokenOut}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm">{batch.intentCount}</span>
+                      <td className="px-8 py-5">
+                        <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{batch.intentCount}</span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-8 py-5">
                         <div className="flex items-center gap-1.5">
-                          <Lock className="w-3.5 h-3.5 text-[hsl(var(--axi-primary))]" />
-                          <span className="text-xs font-mono text-[hsl(var(--axi-text-muted))]">
+                          <Lock className="w-3.5 h-3.5 text-blue-400" />
+                          <span className="text-xs font-bold font-mono text-slate-400 dark:text-slate-500 uppercase">
                             Encrypted
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-8 py-5">
                         {batch.status === "executed" ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium">
-                            <CheckCircle2 className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-100 dark:border-emerald-800/50">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
                             Executed
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium">
-                            <Clock className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold border border-amber-100 dark:border-amber-800/50">
+                            <Clock className="w-3.5 h-3.5" />
                             Pending
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-8 py-5">
                         <div>
-                          <p className="text-xs text-[hsl(var(--axi-text-muted))]">
+                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                             {new Date(batch.createdAt).toLocaleString()}
                           </p>
                           {batch.txHash && (
@@ -235,7 +235,7 @@ export default function BatchesPage() {
                               href={`https://sepolia.etherscan.io/tx/${batch.txHash}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] text-[hsl(var(--axi-primary))] hover:underline mt-0.5"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-500 hover:text-blue-600 hover:underline mt-1 transition-colors"
                             >
                               {batch.txHash.slice(0, 8)}...{batch.txHash.slice(-6)}
                               <ExternalLink className="w-3 h-3" />

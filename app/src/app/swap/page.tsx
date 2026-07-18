@@ -109,34 +109,34 @@ export default function SwapPage() {
         <div className="max-w-lg mx-auto">
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">
-              <Shield className="w-6 h-6 inline-block mr-2 text-[hsl(var(--axi-primary))]" />
+            <h1 className="text-3xl font-bold mb-3 text-slate-800 dark:text-slate-100">
+              <Shield className="w-8 h-8 inline-block mr-2 text-slate-800 dark:text-slate-100" />
               Shielded Swap
             </h1>
-            <p className="text-sm text-[hsl(var(--axi-text-muted))]">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Your swap amount is encrypted — bots can&apos;t see it
             </p>
           </div>
 
           {/* Swap Card */}
-          <div className="glass-card p-6 mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm p-6 mb-4 hover:shadow-md transition-shadow">
             {/* Settings Toggle */}
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-[hsl(var(--axi-text-muted))]">
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
                 Swap
               </span>
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="p-1.5 rounded-lg hover:bg-[hsl(var(--axi-bg-card))] transition-colors"
+                className="p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
               >
-                <Settings className="w-4 h-4 text-[hsl(var(--axi-text-muted))]" />
+                <Settings className="w-4 h-4 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" />
               </button>
             </div>
 
             {/* Slippage Settings */}
             {showSettings && (
-              <div className="mb-4 p-3 rounded-lg bg-[hsl(var(--axi-bg))]">
-                <p className="text-xs font-medium text-[hsl(var(--axi-text-muted))] mb-2">
+              <div className="mb-4 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
                   Slippage Tolerance
                 </p>
                 <div className="flex gap-2">
@@ -144,10 +144,10 @@ export default function SwapPage() {
                     <button
                       key={bps}
                       onClick={() => setSlippageBps(bps)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                         slippageBps === bps
-                          ? "bg-[hsl(var(--axi-primary)/0.2)] text-[hsl(var(--axi-primary))] border border-[hsl(var(--axi-primary)/0.3)]"
-                          : "bg-[hsl(var(--axi-bg-card))] text-[hsl(var(--axi-text-muted))] hover:text-[hsl(var(--axi-text))]"
+                          ? "bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-sm"
+                          : "bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
                       }`}
                     >
                       {bps / 100}%
@@ -158,12 +158,12 @@ export default function SwapPage() {
             )}
 
             {/* Token In */}
-            <div className="p-4 rounded-xl bg-[hsl(var(--axi-bg))] mb-2">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-[hsl(var(--axi-text-muted))]">
+            <div className="p-5 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 mb-2">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   You pay
                 </span>
-                <span className="text-xs text-[hsl(var(--axi-text-muted))]">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Balance: ---
                 </span>
               </div>
@@ -173,62 +173,62 @@ export default function SwapPage() {
                   value={amountIn}
                   onChange={(e) => setAmountIn(e.target.value)}
                   placeholder="0.0"
-                  className="bg-transparent text-3xl font-semibold outline-none flex-1 w-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="bg-transparent text-4xl font-bold text-slate-800 dark:text-slate-100 outline-none flex-1 w-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-slate-300 dark:placeholder:text-slate-600"
                 />
-                <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[hsl(var(--axi-bg-card))] border border-[hsl(var(--axi-border))] hover:border-[hsl(var(--axi-primary)/0.3)] transition-all shrink-0">
-                  <span className="text-lg">{tokenIn.icon}</span>
-                  <span className="font-semibold text-sm">
+                <button className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition-all shrink-0">
+                  <span className="text-xl">{tokenIn.icon}</span>
+                  <span className="font-bold text-sm text-slate-800 dark:text-slate-100">
                     {tokenIn.symbol}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-[hsl(var(--axi-text-muted))]" />
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
                 </button>
               </div>
             </div>
 
             {/* Swap Direction Button */}
-            <div className="flex justify-center -my-3 relative z-10">
+            <div className="flex justify-center -my-4 relative z-10">
               <button
                 onClick={handleSwapTokens}
-                className="p-2 rounded-xl bg-[hsl(var(--axi-bg-card))] border border-[hsl(var(--axi-border))] hover:border-[hsl(var(--axi-primary)/0.3)] hover:bg-[hsl(var(--axi-bg-secondary))] transition-all"
+                className="p-3 rounded-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all"
               >
                 <ArrowDown className="w-4 h-4" />
               </button>
             </div>
 
             {/* Token Out */}
-            <div className="p-4 rounded-xl bg-[hsl(var(--axi-bg))] mt-2">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-[hsl(var(--axi-text-muted))]">
+            <div className="p-5 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 mt-2">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   You receive
                 </span>
-                <span className="text-xs text-[hsl(var(--axi-text-muted))]">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Balance: ---
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="text-3xl font-semibold text-[hsl(var(--axi-text-muted))] flex-1">
+                <div className="text-4xl font-bold text-slate-400 dark:text-slate-500 flex-1">
                   {amountIn ? "~" : "0.0"}
                 </div>
-                <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[hsl(var(--axi-bg-card))] border border-[hsl(var(--axi-border))] hover:border-[hsl(var(--axi-primary)/0.3)] transition-all shrink-0">
-                  <span className="text-lg">{tokenOut.icon}</span>
-                  <span className="font-semibold text-sm">
+                <button className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition-all shrink-0">
+                  <span className="text-xl">{tokenOut.icon}</span>
+                  <span className="font-bold text-sm text-slate-800 dark:text-slate-100">
                     {tokenOut.symbol}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-[hsl(var(--axi-text-muted))]" />
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
                 </button>
               </div>
             </div>
 
             {/* Encryption Info */}
             {amountIn && (
-              <div className="mt-4 p-3 rounded-lg bg-[hsl(var(--axi-primary)/0.05)] border border-[hsl(var(--axi-primary)/0.15)]">
-                <div className="flex items-start gap-2">
-                  <Lock className="w-4 h-4 text-[hsl(var(--axi-primary))] shrink-0 mt-0.5" />
+              <div className="mt-5 p-4 rounded-[1.25rem] bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">
+                <div className="flex items-start gap-3">
+                  <Lock className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs font-medium text-[hsl(var(--axi-primary))]">
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
                       Amount will be encrypted
                     </p>
-                    <p className="text-xs text-[hsl(var(--axi-text-muted))] mt-0.5">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                       Your {amountIn} {tokenIn.symbol} will be encrypted using
                       the Nox SDK before submission. Only you and the TEE can see
                       the actual amount.
@@ -242,23 +242,23 @@ export default function SwapPage() {
             <button
               onClick={handleSubmitIntent}
               disabled={!amountIn || parseFloat(amountIn) <= 0 || isSubmitting}
-              className={`w-full mt-4 py-4 rounded-xl font-semibold text-base transition-all ${
+              className={`w-full mt-6 py-4 rounded-full font-bold text-base transition-all shadow-sm ${
                 !amountIn || parseFloat(amountIn) <= 0
-                  ? "bg-[hsl(var(--axi-bg-card))] text-[hsl(var(--axi-text-muted))] cursor-not-allowed"
-                  : "axi-button"
+                  ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                  : "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:shadow-md active:scale-[0.98]"
               }`}
             >
               <span className="flex items-center justify-center gap-2">
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Encrypting & Submitting...
                   </>
                 ) : !amountIn || parseFloat(amountIn) <= 0 ? (
                   "Enter an amount"
                 ) : (
                   <>
-                    <Shield className="w-4 h-4" />
+                    <Shield className="w-5 h-5" />
                     Shield & Swap
                   </>
                 )}
@@ -273,7 +273,7 @@ export default function SwapPage() {
 
           {/* Intent Status (after submission) */}
           {submittedIntentId !== null && (
-            <div className="mt-4">
+            <div className="mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <IntentStatusDisplay
                 intentId={submittedIntentId}
                 status={intentStatus}
@@ -284,14 +284,14 @@ export default function SwapPage() {
                 }
               />
               {txHash && (
-                <div className="text-center mt-3">
+                <div className="text-center mt-4">
                   <a
                     href={`https://sepolia.arbiscan.io/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-[hsl(var(--axi-primary))] hover:underline"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-500 hover:text-blue-600 hover:underline"
                   >
-                    View Transaction on Arbiscan <ExternalLink className="w-3 h-3" />
+                    View Transaction on Arbiscan <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               )}
@@ -299,12 +299,14 @@ export default function SwapPage() {
           )}
 
           {/* Info Box */}
-          <div className="glass-card p-4 mt-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm mt-4">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-[hsl(var(--axi-text-muted))] shrink-0 mt-0.5" />
+              <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-slate-400 shrink-0">
+                <Info className="w-5 h-5" />
+              </div>
               <div>
-                <p className="text-sm font-medium mb-1">How it works</p>
-                <p className="text-xs text-[hsl(var(--axi-text-muted))] leading-relaxed">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1.5">How it works</p>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                   Your swap amount is encrypted client-side using the Nox JS SDK.
                   The encrypted intent is submitted to the ConfidentialIntentPool
                   contract. When enough intents accumulate, they&apos;re batched and

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
-import IntentStatusDisplay from "@/components/IntentStatus";
 // Removed wagmi to avoid peer dependency and context issues
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { sepolia } from "viem/chains";
@@ -17,6 +16,7 @@ import {
   Activity,
 } from "lucide-react";
 import { useWallet } from "@/context/WalletContext";
+import IntentStatusDisplay from "@/components/IntentStatus";
 
 const publicClient = createPublicClient({
   chain: sepolia,
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       <>
         <Header />
         <main className="pt-24 pb-16 px-4">
-          <div className="max-w-5xl mx-auto text-center mt-20 text-[hsl(var(--axi-text-muted))]">
+          <div className="max-w-5xl mx-auto text-center mt-20 text-slate-500 dark:text-slate-400 font-medium">
             Loading your secure dashboard...
           </div>
         </main>
@@ -128,12 +128,12 @@ export default function DashboardPage() {
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Title */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2">
-              <Wallet className="w-6 h-6 inline-block mr-2 text-[hsl(var(--axi-primary))]" />
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold mb-3 text-slate-800 dark:text-slate-100">
+              <Wallet className="w-8 h-8 inline-block mr-2 text-slate-800 dark:text-slate-100" />
               Dashboard
             </h1>
-            <p className="text-sm text-[hsl(var(--axi-text-muted))]">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Your private portfolio and intent history
             </p>
           </div>
@@ -145,37 +145,41 @@ export default function DashboardPage() {
                 label: "Total Value",
                 value: showBalances ? "$--.--" : "••••••",
                 icon: Wallet,
-                color: "axi-primary",
+                color: "text-blue-500 dark:text-blue-400",
+                bg: "bg-blue-50 dark:bg-blue-900/30",
               },
               {
                 label: "Active Intents",
                 value: recentIntents.length.toString(),
                 icon: Activity,
-                color: "axi-secondary",
+                color: "text-indigo-500 dark:text-indigo-400",
+                bg: "bg-indigo-50 dark:bg-indigo-900/30",
               },
               {
                 label: "MEV Saved",
                 value: "Tracking...",
                 icon: TrendingUp,
-                color: "axi-success",
+                color: "text-emerald-500 dark:text-emerald-400",
+                bg: "bg-emerald-50 dark:bg-emerald-900/30",
               },
               {
                 label: "Privacy Score",
                 value: `${privacyScore}/100`,
                 icon: Shield,
-                color: "axi-primary",
+                color: "text-purple-500 dark:text-purple-400",
+                bg: "bg-purple-50 dark:bg-purple-900/30",
               },
             ].map((stat, i) => (
-              <div key={i} className="glass-card p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <stat.icon
-                    className={`w-4 h-4 text-[hsl(var(--${stat.color}))]`}
-                  />
-                  <span className="text-xs text-[hsl(var(--axi-text-muted))]">
+              <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`p-2.5 rounded-2xl ${stat.bg} ${stat.color}`}>
+                    <stat.icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {stat.label}
                   </span>
                 </div>
-                <p className="text-xl font-bold">{stat.value}</p>
+                <p className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{stat.value}</p>
               </div>
             ))}
           </div>
@@ -183,39 +187,39 @@ export default function DashboardPage() {
           <div className="grid lg:grid-cols-5 gap-6">
             {/* Portfolio (3 cols) */}
             <div className="lg:col-span-3">
-              <div className="glass-card p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">
+              <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm p-8 hover:shadow-md transition-shadow">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 sm:mb-0">
                     Encrypted Portfolio
                   </h2>
                   <button
                     onClick={() => setShowBalances(!showBalances)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[hsl(var(--axi-bg))] text-xs font-medium text-[hsl(var(--axi-text-muted))] hover:text-[hsl(var(--axi-text))] transition-colors"
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   >
                     {showBalances ? (
-                      <EyeOff className="w-3.5 h-3.5" />
+                      <EyeOff className="w-4 h-4" />
                     ) : (
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-4 h-4" />
                     )}
                     {showBalances ? "Hide" : "Decrypt"}
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {portfolioItems.length === 0 ? (
-                    <p className="text-sm text-[hsl(var(--axi-text-muted))] text-center py-4">No balances found.</p>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 text-center py-8">No balances found.</p>
                   ) : portfolioItems.map((item) => (
                     <div
                       key={item.token.symbol}
-                      className="flex items-center justify-between p-4 rounded-xl bg-[hsl(var(--axi-bg))]"
+                      className="flex items-center justify-between p-5 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[hsl(var(--axi-primary)/0.1)] flex items-center justify-center text-xl">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center text-2xl">
                           {item.token.icon}
                         </div>
                         <div>
-                          <p className="font-medium">{item.token.symbol}</p>
-                          <p className="text-xs text-[hsl(var(--axi-text-muted))]">
+                          <p className="font-bold text-slate-800 dark:text-slate-100 text-base">{item.token.symbol}</p>
+                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
                             {item.token.name}
                           </p>
                         </div>
@@ -223,20 +227,20 @@ export default function DashboardPage() {
                       <div className="text-right">
                         {showBalances ? (
                           <>
-                            <p className="font-semibold font-mono">
+                            <p className="font-bold font-mono text-slate-800 dark:text-slate-100 text-lg">
                               {item.decryptedBalance}
                             </p>
-                            <p className="text-xs text-[hsl(var(--axi-text-muted))]">
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
                               {item.usdValue}
                             </p>
                           </>
                         ) : (
                           <>
-                            <p className="font-mono text-sm text-[hsl(var(--axi-text-muted))]">
+                            <p className="font-mono text-sm font-medium text-slate-400 dark:text-slate-500">
                               {item.encryptedHandle}
                             </p>
-                            <p className="text-[10px] text-[hsl(var(--axi-text-muted))] flex items-center gap-1 justify-end">
-                              <Lock className="w-3 h-3" />
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 flex items-center gap-1 justify-end mt-1 uppercase tracking-wider">
+                              <Lock className="w-3 h-3 text-slate-300 dark:text-slate-600" />
                               Encrypted
                             </p>
                           </>
@@ -247,22 +251,22 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Privacy Score Bar */}
-                <div className="mt-6 pt-4 border-t border-[hsl(var(--axi-border)/0.3)]">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-[hsl(var(--axi-text-muted))]">
+                <div className="mt-8 pt-6 border-t border-slate-100/60 dark:border-slate-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Privacy Score
                     </span>
-                    <span className="text-xs font-semibold text-[hsl(var(--axi-success))]">
+                    <span className="text-xs font-bold text-emerald-500">
                       {privacyScore}%
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-[hsl(var(--axi-bg))]">
+                  <div className="w-full h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-[hsl(var(--axi-primary))] to-[hsl(var(--axi-success))] transition-all duration-500"
+                      className="h-full rounded-full bg-emerald-500 transition-all duration-1000"
                       style={{ width: `${privacyScore}%` }}
                     />
                   </div>
-                  <p className="text-[10px] text-[hsl(var(--axi-text-muted))] mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">
                     All vault balances encrypted • 100% intents batched • No
                     plain-text exposure
                   </p>
@@ -272,20 +276,20 @@ export default function DashboardPage() {
 
             {/* Recent Intents (2 cols) */}
             <div className="lg:col-span-2">
-              <div className="glass-card p-6">
-                <h2 className="text-lg font-semibold mb-4">Recent Intents</h2>
-                <div className="space-y-3">
+              <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm p-8 hover:shadow-md transition-shadow">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6">Recent Intents</h2>
+                <div className="space-y-6">
                   {recentIntents.length === 0 ? (
-                    <p className="text-sm text-[hsl(var(--axi-text-muted))] text-center py-4">No recent intents.</p>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 text-center py-8">No recent intents.</p>
                   ) : recentIntents.map((intent) => (
-                    <div key={intent.id}>
-                      <div className="flex items-center justify-between mb-1">
+                    <div key={intent.id} className="relative">
+                      <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-[hsl(var(--axi-text-muted))]">
+                          <span className="text-xs font-bold font-mono text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 px-2.5 py-1 rounded-md border border-slate-100 dark:border-slate-800">
                             {intent.tokenIn} → {intent.tokenOut}
                           </span>
                         </div>
-                        <span className="text-[10px] text-[hsl(var(--axi-text-muted))]">
+                        <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                           {intent.time}
                         </span>
                       </div>

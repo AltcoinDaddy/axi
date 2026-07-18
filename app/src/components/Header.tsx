@@ -1,15 +1,43 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield, Menu, X, LogOut } from "lucide-react";
+import { Shield, Menu, X, LogOut, ChevronRight, Sun, Moon } from "lucide-react";
 import { useWallet } from "@/context/WalletContext";
+import { useTheme } from "next-themes";
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return <div className="w-9 h-9" />;
+
+  return (
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+      title="Toggle theme"
+    >
+      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
+}
 
 export default function Header() {
   const pathname = usePathname();
   const { account, isConnecting, connectWallet, disconnectWallet } = useWallet();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navLinks = [
     { href: "/swap", label: "Swap" },
@@ -18,108 +46,112 @@ export default function Header() {
     { href: "/batches", label: "Batches" },
   ];
 
-  // Removed local connectWallet and useEffect because it's now in WalletContext
-
   const truncateAddress = (addr: string) =>
     `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-[hsl(var(--axi-border)/0.3)]">
-      <div className="backdrop-blur-xl bg-[hsl(var(--axi-bg)/0.8)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative">
-                <Shield className="w-8 h-8 text-[hsl(var(--axi-primary))] shield-pulse" />
-                <div className="absolute inset-0 bg-[hsl(var(--axi-primary)/0.2)] rounded-full blur-xl group-hover:bg-[hsl(var(--axi-primary)/0.3)] transition-all" />
-              </div>
-              <span className="text-xl font-bold">
-                <span className="glow-text">Axi</span>
-              </span>
-              <span className="hidden sm:inline-block text-xs px-2 py-0.5 rounded-full bg-[hsl(var(--axi-primary)/0.15)] text-[hsl(var(--axi-primary))] border border-[hsl(var(--axi-primary)/0.3)] font-medium">
-                Sepolia
-              </span>
-            </Link>
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? "bg-background/90 backdrop-blur-md shadow-[0_1px_3px_rgba(0,0,0,0.02)]" 
+          : "bg-transparent border-transparent py-2"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
+            <div className="p-2 rounded-full bg-primary text-primary-foreground shadow-sm">
+              <Shield className="w-5 h-5" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-foreground">
+              Axi
+            </span>
+          </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-2">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    pathname === link.href
-                      ? "bg-[hsl(var(--axi-primary)/0.15)] text-[hsl(var(--axi-primary))] border border-[hsl(var(--axi-primary)/0.3)]"
-                      : "text-[hsl(var(--axi-text-muted))] hover:text-[hsl(var(--axi-text))] hover:bg-[hsl(var(--axi-bg-card))]"
+                  className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
+                    isActive
+                      ? "bg-secondary text-secondary-foreground"
+                      : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
                   }`}
                 >
                   {link.label}
                 </Link>
-              ))}
-            </nav>
+              );
+            })}
+          </nav>
 
-            {/* Wallet Connect */}
-            <div className="flex items-center gap-3">
-              {account ? (
-                <div className="flex items-center gap-2 bg-[hsl(var(--axi-bg-card))] px-3 py-1.5 rounded-lg border border-[hsl(var(--axi-border)/0.5)]">
-                  <div className="status-dot bg-[hsl(var(--axi-success))]" />
-                  <span className="text-sm font-mono text-[hsl(var(--axi-text-muted))]">
-                    {truncateAddress(account)}
-                  </span>
-                  <button 
-                    onClick={disconnectWallet}
-                    className="ml-2 text-[hsl(var(--axi-text-muted))] hover:text-red-400 transition-colors"
-                    title="Disconnect Wallet"
-                  >
-                    <LogOut size={16} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={connectWallet}
-                  disabled={isConnecting}
-                  className="axi-button text-sm"
+          {/* Wallet Connect & Theme Toggle */}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+
+            {account ? (
+              <div className="flex items-center gap-0 bg-card border rounded-full p-1 pl-3 shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-sm font-semibold text-foreground ml-2 mr-3">
+                  {truncateAddress(account)}
+                </span>
+                <button 
+                  onClick={disconnectWallet}
+                  className="p-2 rounded-full text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  title="Disconnect Wallet"
                 >
-                  <span>
-                    {isConnecting ? "Connecting..." : "Connect Wallet"}
-                  </span>
+                  <LogOut size={16} />
                 </button>
-              )}
-
-              {/* Mobile menu toggle */}
+              </div>
+            ) : (
               <button
-                className="md:hidden p-2 text-[hsl(var(--axi-text-muted))]"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={connectWallet}
+                disabled={isConnecting}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2.5 text-sm font-semibold rounded-full shadow-sm transition-all hover:shadow-md disabled:opacity-50"
               >
-                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                {isConnecting ? "Connecting..." : "Connect Wallet"}
               </button>
-            </div>
+            )}
+
+            {/* Mobile menu toggle */}
+            <button
+              className="md:hidden p-2 text-foreground rounded-full hover:bg-secondary transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Nav */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-[hsl(var(--axi-border)/0.3)] backdrop-blur-xl bg-[hsl(var(--axi-bg)/0.95)]">
-          <nav className="px-4 py-3 flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  pathname === link.href
-                    ? "bg-[hsl(var(--axi-primary)/0.15)] text-[hsl(var(--axi-primary))]"
-                    : "text-[hsl(var(--axi-text-muted))]"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
+      <div 
+        className={`md:hidden absolute top-full left-0 right-0 border-b bg-background/95 backdrop-blur-md transition-all duration-300 ease-in-out origin-top ${
+          isMenuOpen ? "opacity-100 scale-y-100 shadow-sm" : "opacity-0 scale-y-0 pointer-events-none"
+        }`}
+      >
+        <nav className="p-4 flex flex-col gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsMenuOpen(false)}
+              className={`flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-2xl transition-colors ${
+                pathname === link.href
+                  ? "bg-secondary text-secondary-foreground"
+                  : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+              }`}
+            >
+              {link.label}
+              <ChevronRight className="w-4 h-4 opacity-50" />
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }
