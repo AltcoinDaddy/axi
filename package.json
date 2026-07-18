@@ -1,0 +1,47 @@
+{
+  "name": "axi",
+  "version": "1.0.0",
+  "description": "Axi — Private DeFi Intent Router powered by iExec Nox",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:sepolia": "hardhat ignition deploy ./ignition/modules/Axi.ts --network sepolia",
+    "dev": "cd app && npm run dev",
+    "build": "cd app && npm run build"
+  },
+  "dependencies": {
+    "@iexec-nox/nox-confidential-contracts": "latest",
+    "@iexec-nox/nox-protocol-contracts": "latest",
+    "@nomicfoundation/hardhat-ignition": "^3.1.8",
+    "@nomicfoundation/hardhat-ignition-viem": "^3.1.6",
+    "@nomicfoundation/hardhat-keystore": "^3.0.12",
+    "@nomicfoundation/hardhat-network-helpers": "^3.0.11",
+    "@nomicfoundation/hardhat-node-test-runner": "^3.0.17",
+    "@nomicfoundation/hardhat-verify": "^3.0.21",
+    "@nomicfoundation/hardhat-viem": "^3.0.9",
+    "@nomicfoundation/hardhat-viem-assertions": "^3.1.2",
+    "@nomicfoundation/ignition-core": "^3.1.8",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.1.1",
+    "chai": "^4.5.0",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.17.0",
+    "graphql": "^17.0.2",
+    "hardhat-gas-reporter": "^2.3.0",
+    "solidity-coverage": "^0.8.17"
+  },
+  "devDependencies": {
+    "@iexec-nox/nox-hardhat-plugin": "latest",
+    "@nomicfoundation/hardhat-toolbox-viem": "latest",
+    "hardhat": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "type": "module"
+}

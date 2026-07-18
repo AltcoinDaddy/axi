@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+cache/
+artifacts/
+typechain-types/
+
+# Environment
+.env
+.env.local
+
+# Next.js
+app/.next/
+app/out/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Hardhat
+coverage/
+coverage.json
+
+# Docs
+ARCHITECTURE.md
+feedback.md
