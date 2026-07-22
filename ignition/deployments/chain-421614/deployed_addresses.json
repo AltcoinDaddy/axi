@@ -1,7 +1,7 @@
 {
-  "NoxShieldModule#NoxShieldRouter": "0x92C437D75d62e51c1518FE5584CCD4374eEE665B",
-  "NoxShieldModule#WrappedConfidentialETH": "0x2724fA7853F6DdBEBd5d2F7d3c86932E09b33E39",
-  "NoxShieldModule#WrappedConfidentialUSDC": "0xA31BD4c60b2B85Cdc3d0A6570B29fB14D3ed4649",
-  "NoxShieldModule#ConfidentialIntentPool": "0xB21d2B6f0F5D746C166BC1a1A9BD3D29DDf9788D",
-  "NoxShieldModule#NoxShieldVault": "0xD4d40456c8c7379337a2cfB511DFacaa9AA38c2E"
+  "AxiModule#AxiRouter": "0xEc562c163565237Cb4F65B480414a46706A674EA",
+  "AxiModule#WrappedConfidentialETH": "0x024CFd6258ABA52bF5B66C9571200Fc06F17520c",
+  "AxiModule#WrappedConfidentialUSDC": "0x5a1B65711844761d0e14b5A1cb4F545823f0645F",
+  "AxiModule#AxiVault": "0xbf8467fC3bF9a438D401D18A7872FE6f9159cA9c",
+  "AxiModule#ConfidentialIntentPool": "0xa78C22d8060fDb3780932cab9B9137b63136b0Dd"
 }

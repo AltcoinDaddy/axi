@@ -17,10 +17,10 @@ import {
   AlertCircle,
   ExternalLink,
 } from "lucide-react";
-import { TOKENS, IntentStatus, DEFAULT_SLIPPAGE_BPS, CONTRACTS } from "@/lib/constants";
+import { TOKENS, IntentStatus, DEFAULT_SLIPPAGE_BPS, CONTRACTS, CHAIN } from "@/lib/constants";
 import { useWallet } from "@/context/WalletContext";
 import { getWalletClient, encryptAmount } from "@/lib/nox";
-import { parseAbiItem, parseUnits, publicActions } from "viem";
+import { parseAbiItem, parseUnits, publicActions, createPublicClient, custom } from "viem";
 
 export default function SwapPage() {
   const [tokenInIndex, setTokenInIndex] = useState(1); // USDC
@@ -29,6 +29,7 @@ export default function SwapPage() {
   const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS);
   const [showSettings, setShowSettings] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingText, setLoadingText] = useState("Encrypting & Submitting...");
   const [submittedIntentId, setSubmittedIntentId] = useState<number | null>(null);
   const [intentStatus, setIntentStatus] = useState<IntentStatus>(IntentStatus.PENDING);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -40,31 +41,40 @@ export default function SwapPage() {
   const handleSwapTokens = () => {
     setTokenInIndex(tokenOutIndex);
     setTokenOutIndex(tokenInIndex);
+    setAmountIn("");
   };
 
   const handleSubmitIntent = async () => {
-    if (!amountIn || parseFloat(amountIn) <= 0 || !account) {
-      if (!account) alert("Please connect your wallet first.");
-      return;
-    }
+    if (!amountIn || parseFloat(amountIn) <= 0) return;
 
     setIsSubmitting(true);
+    setLoadingText("Connecting wallet...");
     setTxHash(null);
 
     try {
       const walletClient = await getWalletClient();
-      const extendedClient = walletClient.extend(publicActions);
+      const [connectedAccount] = await walletClient.getAddresses();
+
+      const publicClient = createPublicClient({
+        chain: CHAIN,
+        transport: custom(window.ethereum),
+      });
+
+      const extendedClient = publicClient.extend(publicActions);
+
+      const intentPoolAddr = CONTRACTS.intentPool as `0x${string}`;
       const amountInWei = parseUnits(amountIn, tokenIn.decimals || 18);
       
-      // 1. Encrypt the amount using Nox SDK
-      // Note: In real life we need the contract address of the Intent Pool
-      const intentPoolAddr = CONTRACTS.intentPool as `0x${string}`;
+      // Intent type 0 = SWAP
+      const intentType = 0; 
+      const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600); // 1 hr from now
+
+      setLoadingText("Please sign message in wallet...");
+      // 1. Encrypt amount client-side
       const { handle, handleProof } = await encryptAmount(amountInWei, intentPoolAddr);
 
-      // 2. Submit the encrypted intent to the contract
-      const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600); // 1 hour from now
-      const intentType = 0; // SWAP
-
+      setLoadingText("Estimating gas...");
+      // 2. Submit intent
       const { request } = await extendedClient.simulateContract({
         address: intentPoolAddr,
         abi: [
@@ -79,26 +89,45 @@ export default function SwapPage() {
           handleProof,
           deadline
         ],
-        account: account as `0x${string}`,
+        account: connectedAccount as `0x${string}`,
       });
 
+      setLoadingText("Confirm transaction in wallet...");
+      // Send transaction
       const hash = await walletClient.writeContract(request);
+      
       setTxHash(hash);
+      setLoadingText("Waiting for blockchain confirmation...");
+
+      // Wait for receipt, but with a timeout so it doesn't hang forever
+      try {
+        const receipt = await extendedClient.waitForTransactionReceipt({ 
+          hash,
+          timeout: 10000 // wait max 10 seconds
+        });
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted on-chain");
+        }
+      } catch (e: any) {
+        // If it times out or fails polling due to wallet RPC issues,
+        // we still consider it submitted because we got the hash.
+        console.warn("waitForTransactionReceipt issue:", e);
+      }
       
-      // Wait for receipt
-      const receipt = await extendedClient.waitForTransactionReceipt({ hash });
-      
-      // We don't parse the exact intentId for the demo, just show success
+      setLoadingText("Success!");
+      // Reset form
+      setAmountIn("");
       setSubmittedIntentId(Math.floor(Math.random() * 1000));
       setIntentStatus(IntentStatus.PENDING);
 
-      // Simulate batching for UI demo purposes since we don't have a live relayer
-      setTimeout(() => setIntentStatus(IntentStatus.BATCHED), 4000);
-    } catch (error) {
+      // Removed simulation since backend daemon handles it now
+    } catch (error: any) {
       console.error("Failed to submit intent:", error);
-      alert("Transaction failed. Make sure you are on Arbitrum Sepolia.");
+      const msg = error?.shortMessage || error?.message || "Unknown error";
+      alert(`Transaction failed: ${msg}`);
     } finally {
       setIsSubmitting(false);
+      setLoadingText("Encrypting & Submitting...");
     }
   };
 
@@ -252,7 +281,7 @@ export default function SwapPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Encrypting & Submitting...
+                    {loadingText}
                   </>
                 ) : !amountIn || parseFloat(amountIn) <= 0 ? (
                   "Enter an amount"

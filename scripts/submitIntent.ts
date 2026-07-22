@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { parseAbiItem, createPublicClient, createWalletClient, http, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { arbitrumSepolia } from "viem/chains";
+import { createViemHandleClient } from "@iexec-nox/handle";
 
 dotenv.config();
 
@@ -33,9 +34,16 @@ async function main() {
     account
   }).extend(publicActions);
 
-  // We use dummy values for handle/proof
-  const handle = ("0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")) as `0x${string}`;
-  const proof = "0x";
+
+  console.log("Encrypting amount using Nox SDK...");
+  const noxClient = await createViemHandleClient(walletClient);
+  
+  // Encrypt 1 WETH (1e18) for the intent pool
+  const amountToEncrypt = BigInt(1000000000000000000); // 1 ETH/WETH
+  const result = await noxClient.encryptInput(amountToEncrypt, "uint256", intentPoolAddress);
+  
+  const handle = result.handle as `0x${string}`;
+  const proof = result.handleProof as `0x${string}`;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600);
 
   console.log("Submitting intent...");

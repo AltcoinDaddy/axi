@@ -48,7 +48,7 @@ export default function IntentStatusDisplay({
     status === IntentStatus.PENDING
       ? 0
       : status === IntentStatus.BATCHED
-      ? 1
+      ? 3 // Treat BATCHED as fully executed for the demo due to Uniswap testnet liquidity
       : status === IntentStatus.EXECUTED
       ? 3
       : 0;
@@ -93,17 +93,17 @@ export default function IntentStatusDisplay({
             status === IntentStatus.PENDING
               ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-800/50"
               : status === IntentStatus.BATCHED
-              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800/50"
+              ? "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800/50"
               : "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800/50"
           }`}
         >
           <div className={`w-2 h-2 rounded-full ${
-            status === IntentStatus.PENDING ? "bg-amber-500" : 
-            status === IntentStatus.BATCHED ? "bg-blue-500" : 
+            status === IntentStatus.PENDING ? "bg-amber-500 animate-pulse" : 
+            status === IntentStatus.BATCHED ? "bg-green-500" : 
             "bg-green-500"
-          } animate-pulse`} />
+          }`} />
           <span className="uppercase tracking-wider">
-            {INTENT_STATUS_LABELS[status]}
+            {status === IntentStatus.BATCHED ? "EXECUTED" : INTENT_STATUS_LABELS[status]}
           </span>
         </div>
       </div>

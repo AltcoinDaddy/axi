@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { VaultPrivacyBreakdown } from "@/components/PrivacyIndicator";
 import {
@@ -14,7 +14,9 @@ import {
   Info,
   Loader2,
 } from "lucide-react";
-import { TOKENS } from "@/lib/constants";
+import { TOKENS, CHAIN, CONTRACTS } from "@/lib/constants";
+import { getWalletClient } from "@/lib/nox";
+import { createPublicClient, custom, parseAbiItem, parseUnits, formatUnits } from "viem";
 
 export default function VaultPage() {
   const [selectedTokenIndex, setSelectedTokenIndex] = useState(1); // USDC
@@ -24,35 +26,183 @@ export default function VaultPage() {
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
   const [showBalance, setShowBalance] = useState(false);
 
-  // Simulated encrypted balances (in production, decrypted via Nox SDK)
-  const [encryptedBalances] = useState<Record<string, string>>({
-    WETH: "0x7f3a...encrypted...9c2b",
-    USDC: "0x4e8d...encrypted...1a7f",
+  const [encryptedBalances, setEncryptedBalances] = useState<Record<string, string>>({
+    WETH: "Loading...",
+    USDC: "Loading...",
   });
 
-  const [decryptedBalances] = useState<Record<string, string>>({
-    WETH: "2.5000",
-    USDC: "5,000.00",
+  const [decryptedBalances, setDecryptedBalances] = useState<Record<string, string>>({
+    WETH: "0.00",
+    USDC: "0.00",
   });
+
+  const [isDecrypting, setIsDecrypting] = useState(false);
 
   const selectedToken = TOKENS[selectedTokenIndex];
+
+  // Fetch encrypted balances on mount
+  useEffect(() => {
+    async function fetchBalances() {
+      try {
+        const walletClient = await getWalletClient();
+        const [connectedAccount] = await walletClient.getAddresses();
+        const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+
+        const newEncrypted: Record<string, string> = {};
+        for (const token of TOKENS) {
+          const handle = await publicClient.readContract({
+            address: CONTRACTS.vault as `0x${string}`,
+            abi: [parseAbiItem("function getBalance(address user, address token) external view returns (uint256)")],
+            functionName: "getBalance",
+            args: [connectedAccount, token.address as `0x${string}`],
+          }) as bigint;
+          
+          if (handle > 0n) {
+            const hexHandle = `0x${handle.toString(16).padStart(64, '0')}`;
+            newEncrypted[token.symbol] = `${hexHandle.substring(0, 6)}...encrypted...${hexHandle.substring(62)}`;
+          } else {
+            newEncrypted[token.symbol] = "No balance";
+          }
+        }
+        setEncryptedBalances(newEncrypted);
+      } catch (e) {
+        console.error("Failed to fetch encrypted balances", e);
+      }
+    }
+    fetchBalances();
+  }, [isDepositing, isWithdrawing]);
+
+  const handleToggleDecrypt = async () => {
+    if (showBalance) {
+      setShowBalance(false);
+      return;
+    }
+    setIsDecrypting(true);
+    try {
+      const walletClient = await getWalletClient();
+      const [connectedAccount] = await walletClient.getAddresses();
+      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+      const { decryptHandle } = await import("@/lib/nox");
+
+      const newDecrypted: Record<string, string> = {};
+      
+      for (const token of TOKENS) {
+        const handle = await publicClient.readContract({
+          address: CONTRACTS.vault as `0x${string}`,
+          abi: [parseAbiItem("function getBalance(address user, address token) external view returns (uint256)")],
+          functionName: "getBalance",
+          args: [connectedAccount, token.address as `0x${string}`],
+        }) as bigint;
+        
+        if (handle > 0n) {
+          const hexHandle = `0x${handle.toString(16).padStart(64, '0')}` as `0x${string}`;
+          const plaintextWei = await decryptHandle(hexHandle);
+          const formatted = parseFloat(formatUnits(plaintextWei, token.decimals)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+          newDecrypted[token.symbol] = formatted;
+        } else {
+          newDecrypted[token.symbol] = "0.00";
+        }
+      }
+      setDecryptedBalances(newDecrypted);
+      setShowBalance(true);
+    } catch (e: any) {
+      console.error("Decryption failed", e);
+      alert(`Decryption failed: ${e?.message || "Unknown error"}`);
+    } finally {
+      setIsDecrypting(false);
+    }
+  };
 
   const handleDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
     setIsDepositing(true);
-    // Simulate deposit flow
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsDepositing(false);
-    setAmount("");
+    try {
+      const walletClient = await getWalletClient();
+      const [connectedAccount] = await walletClient.getAddresses();
+      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+      const amountWei = parseUnits(amount, selectedToken.decimals);
+      
+      // 1. Approve
+      const { request: approveReq } = await publicClient.simulateContract({
+        address: selectedToken.address as `0x${string}`,
+        abi: [parseAbiItem("function approve(address spender, uint256 amount) external returns (bool)")],
+        functionName: "approve",
+        args: [CONTRACTS.vault as `0x${string}`, amountWei],
+        account: connectedAccount,
+      });
+      const approveHash = await walletClient.writeContract(approveReq);
+      
+      try {
+        await publicClient.waitForTransactionReceipt({ hash: approveHash, timeout: 6000 });
+      } catch (e) {
+        console.warn("Approve receipt timeout, proceeding anyway:", e);
+      }
+      
+      // 2. Deposit
+      const { request: depositReq } = await publicClient.simulateContract({
+        address: CONTRACTS.vault as `0x${string}`,
+        abi: [parseAbiItem("function deposit(address token, uint256 amount) external")],
+        functionName: "deposit",
+        args: [selectedToken.address as `0x${string}`, amountWei],
+        account: connectedAccount,
+      });
+      const depositHash = await walletClient.writeContract(depositReq);
+      
+      try {
+        await publicClient.waitForTransactionReceipt({ hash: depositHash, timeout: 6000 });
+      } catch (e) {
+        console.warn("Deposit receipt timeout, proceeding anyway:", e);
+      }
+      
+      setAmount("");
+      alert("Successfully deposited to Vault! Your balance is now encrypted.");
+    } catch (error: any) {
+      console.error(error);
+      alert(`Deposit failed: ${error?.shortMessage || error?.message || "Unknown error"}`);
+    } finally {
+      setIsDepositing(false);
+    }
   };
 
   const handleWithdraw = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
     setIsWithdrawing(true);
-    // Simulate withdraw flow (encrypt amount → unwrap → finalize)
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setIsWithdrawing(false);
-    setAmount("");
+    try {
+      const walletClient = await getWalletClient();
+      const [connectedAccount] = await walletClient.getAddresses();
+      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+      const amountWei = parseUnits(amount, selectedToken.decimals);
+      
+      const { encryptAmount } = await import("@/lib/nox");
+      const { handle, handleProof } = await encryptAmount(amountWei, CONTRACTS.vault as `0x${string}`);
+      
+      const { request: withdrawReq } = await publicClient.simulateContract({
+        address: CONTRACTS.vault as `0x${string}`,
+        abi: [parseAbiItem("function withdraw(address token, bytes32 encryptedAmount, bytes calldata inputProof) external")],
+        functionName: "withdraw",
+        args: [selectedToken.address as `0x${string}`, handle, handleProof],
+        account: connectedAccount,
+      });
+      
+      const withdrawHash = await walletClient.writeContract(withdrawReq);
+      try {
+        const receipt = await publicClient.waitForTransactionReceipt({ hash: withdrawHash, timeout: 15000 });
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted on-chain");
+        }
+      } catch (e: any) {
+        if (e.message?.includes("reverted")) throw e;
+        console.warn("Withdraw receipt timeout, proceeding anyway:", e);
+      }
+      
+      alert("Successfully withdrawn from Vault!");
+      setAmount("");
+    } catch (error: any) {
+      console.error(error);
+      alert(`Withdraw failed: ${error?.shortMessage || error?.message || "Unknown error"}`);
+    } finally {
+      setIsWithdrawing(false);
+    }
   };
 
   return (
@@ -78,15 +228,18 @@ export default function VaultPage() {
                 Your Encrypted Balances
               </h2>
               <button
-                onClick={() => setShowBalance(!showBalance)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                onClick={handleToggleDecrypt}
+                disabled={isDecrypting}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
               >
-                {showBalance ? (
+                {isDecrypting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : showBalance ? (
                   <EyeOff className="w-3.5 h-3.5" />
                 ) : (
                   <Eye className="w-3.5 h-3.5" />
                 )}
-                {showBalance ? "Hide" : "Decrypt & Show"}
+                {isDecrypting ? "Decrypting..." : showBalance ? "Hide" : "Decrypt & Show"}
               </button>
             </div>
 

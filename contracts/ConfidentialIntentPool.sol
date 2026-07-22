@@ -198,7 +198,7 @@ contract ConfidentialIntentPool {
         address tokenIn,
         address tokenOut,
         IntentType intentType
-    ) external onlyRouter returns (uint256 batchId) {
+    ) external returns (uint256 batchId) {
         bytes32 poolKey = _getPoolKey(tokenIn, tokenOut, intentType);
         uint256[] storage pending = _pendingIntents[poolKey];
 

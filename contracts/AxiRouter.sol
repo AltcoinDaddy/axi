@@ -161,6 +161,9 @@ contract AxiRouter {
         uint256 fee = (totalAmountIn * feeBps) / BPS_DENOMINATOR;
         uint256 swapAmount = totalAmountIn - fee;
 
+        // Pull aggregated tokens from the Confidential Vault
+        vault.routerSpend(address(0), tokenIn, totalAmountIn);
+
         // Approve Uniswap router to spend tokens
         IERC20(tokenIn).approve(uniswapRouter, swapAmount);
 
@@ -178,6 +181,12 @@ contract AxiRouter {
                 sqrtPriceLimitX96: 0
             })
         );
+
+        // In a full production implementation, the TEE would submit a callback to 
+        // distribute the exact amountOut proportionally to the users' encrypted balances.
+        // For this demo, the router sends the total amountOut back to the Vault
+        // and the TEE directly updates the user balances via the Nox SDK off-chain.
+        IERC20(tokenOut).transfer(address(vault), amountOut);
 
         // Store batch results
         batchResults[batchId][tokenOut] = amountOut;

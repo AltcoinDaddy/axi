@@ -36,6 +36,21 @@ export async function getWalletClient(): Promise<WalletClient> {
   // Request account access
   await walletClient.requestAddresses();
 
+  // Ensure the user is on the correct network (Arbitrum Sepolia)
+  try {
+    const chainId = await walletClient.getChainId();
+    if (chainId !== CHAIN.id) {
+      await walletClient.switchChain({ id: CHAIN.id });
+    }
+  } catch (error: any) {
+    if (error.code === 4902) {
+      // Chain not added to MetaMask yet
+      await walletClient.addChain({ chain: CHAIN });
+    } else {
+      console.warn("Could not switch chain automatically:", error);
+    }
+  }
+
   return walletClient;
 }
 

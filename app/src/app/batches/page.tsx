@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 // Removed wagmi
 import { createPublicClient, http, parseAbiItem } from "viem";
-import { sepolia } from "viem/chains";
-import { RPC_URL, CONTRACTS } from "@/lib/constants";
+import { CHAIN, RPC_URL, CONTRACTS, TOKENS } from "@/lib/constants";
 import {
   Layers,
   CheckCircle2,
@@ -16,7 +15,7 @@ import {
 } from "lucide-react";
 
 const publicClient = createPublicClient({
-  chain: sepolia,
+  chain: CHAIN,
   transport: http(RPC_URL),
 });
 
@@ -43,11 +42,11 @@ export default function BatchesPage() {
           return; // Not deployed
         }
 
-        // Fetch real logs from the router contract
+        // Fetch real logs from the intentPool contract
         const logs = await publicClient.getLogs({
-          address: CONTRACTS.router,
-          event: parseAbiItem('event BatchSwapExecuted(uint256 indexed batchId, address indexed tokenIn, address indexed tokenOut, uint256 totalAmountIn, uint256 totalAmountOut, uint256 intentCount)'),
-          fromBlock: "earliest",
+          address: CONTRACTS.intentPool,
+          event: parseAbiItem('event BatchFormed(uint256 indexed batchId, uint256 intentCount, address tokenIn, address tokenOut)'),
+          fromBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK_NUMBER || "289000000"),
         });
 
         const formattedBatches = await Promise.all(
@@ -55,8 +54,8 @@ export default function BatchesPage() {
             const block = await publicClient.getBlock({ blockHash: log.blockHash });
             return {
               id: Number(log.args.batchId),
-              tokenIn: log.args.tokenIn === "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14" ? "WETH" : "USDC",
-              tokenOut: log.args.tokenOut === "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14" ? "WETH" : "USDC",
+              tokenIn: log.args.tokenIn === TOKENS[0].address ? "WETH" : "USDC",
+              tokenOut: log.args.tokenOut === TOKENS[0].address ? "WETH" : "USDC",
               intentCount: Number(log.args.intentCount),
               status: "executed",
               createdAt: new Date(Number(block.timestamp) * 1000).toISOString(),
@@ -232,7 +231,7 @@ export default function BatchesPage() {
                           </p>
                           {batch.txHash && (
                             <a
-                              href={`https://sepolia.etherscan.io/tx/${batch.txHash}`}
+                              href={`https://sepolia.arbiscan.io/tx/${batch.txHash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-500 hover:text-blue-600 hover:underline mt-1 transition-colors"

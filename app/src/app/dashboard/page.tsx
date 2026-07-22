@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useWallet } from "@/context/WalletContext";
 import IntentStatusDisplay from "@/components/IntentStatus";
+import { formatUnits } from "viem";
+import { getWalletClient } from "@/lib/nox";
 
 const publicClient = createPublicClient({
   chain: sepolia,
@@ -26,6 +28,7 @@ const publicClient = createPublicClient({
 export default function DashboardPage() {
   const { account: address } = useWallet();
   const [showBalances, setShowBalances] = useState(false);
+  const [isDecrypting, setIsDecrypting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Real data state
@@ -41,6 +44,17 @@ export default function DashboardPage() {
       }
 
       try {
+        // Fetch prices from CoinGecko first
+        let prices = { ethereum: { usd: 3500 }, 'usd-coin': { usd: 1 } }; // fallbacks
+        try {
+          const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd");
+          if (res.ok) {
+            prices = await res.json();
+          }
+        } catch (e) {
+          console.warn("Failed to fetch CoinGecko prices, using fallbacks");
+        }
+
         // 1. Fetch encrypted balances from Vault
         const items = await Promise.all(
           TOKENS.map(async (token) => {
@@ -48,24 +62,30 @@ export default function DashboardPage() {
               // Note: actual contract ABI for getBalance must match
               const balanceHandle = await publicClient.readContract({
                 address: CONTRACTS.vault,
-                abi: [parseAbiItem("function getBalance(address user, address token) view returns (bytes)")],
+                abi: [parseAbiItem("function getBalance(address user, address token) view returns (uint256)")],
                 functionName: "getBalance",
                 args: [address as `0x${string}`, token.address],
-              }) as `0x${string}`;
+              }) as bigint;
 
               let decryptedBalance = "0.00";
-              if (showBalances && balanceHandle !== "0x") {
-                // To do this for real, user must sign a decryption request
-                // For now, we will show "Unlock to view" if they want to decrypt
-                // const { value } = await nox.decrypt(balanceHandle);
-                decryptedBalance = "Unlock to view"; 
+              if (balanceHandle > 0n) {
+                const hexHandle = `0x${balanceHandle.toString(16).padStart(64, '0')}`;
+                
+                return {
+                  token,
+                  encryptedHandle: `${hexHandle.substring(0, 6)}...encrypted...${hexHandle.substring(62)}`,
+                  decryptedBalance: "Unlock to view",
+                  usdValue: "$--.--",
+                  rawHandle: hexHandle
+                };
               }
 
               return {
                 token,
-                encryptedHandle: balanceHandle === "0x" ? "0x0000...0000" : `${balanceHandle.substring(0, 10)}...${balanceHandle.substring(balanceHandle.length - 4)}`,
-                decryptedBalance,
-                usdValue: "$--.--", // Mock price for now
+                encryptedHandle: "No balance",
+                decryptedBalance: "0.00",
+                usdValue: "$0.00",
+                rawHandle: null
               };
             } catch (e) {
               return {
@@ -73,6 +93,7 @@ export default function DashboardPage() {
                 encryptedHandle: "No balance",
                 decryptedBalance: "0.00",
                 usdValue: "$0.00",
+                rawHandle: null
               };
             }
           })
@@ -83,18 +104,36 @@ export default function DashboardPage() {
         // For real intents, we fetch IntentSubmitted events
         const logs = await publicClient.getLogs({
           address: CONTRACTS.intentPool,
-          event: parseAbiItem('event IntentSubmitted(uint256 indexed intentId, address indexed user, address tokenIn, address tokenOut, uint256 deadline)'),
+          event: parseAbiItem('event IntentSubmitted(uint256 indexed intentId, address indexed user, uint8 intentType, address tokenIn, address tokenOut, uint256 deadline)'),
           args: { user: address as `0x${string}` },
-          fromBlock: "earliest",
+          fromBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK_NUMBER || "289000000"),
         });
 
-        const intents = logs.map((log) => ({
-          id: Number(log.args.intentId),
-          status: 0, // Pending by default, need to check if executed
-          tokenIn: log.args.tokenIn === TOKENS[0].address ? "WETH" : "USDC",
-          tokenOut: log.args.tokenOut === TOKENS[0].address ? "WETH" : "USDC",
-          time: "Recently", // Simplified
-        }));
+        const intents = await Promise.all(
+          logs.map(async (log) => {
+            const intentId = log.args.intentId;
+            let status = 0; // Default pending
+            try {
+              const intentData = await publicClient.readContract({
+                address: CONTRACTS.intentPool as `0x${string}`,
+                abi: [parseAbiItem("function intents(uint256) external view returns (uint256, address, uint8, address, address, uint256, uint256, uint8, uint256, uint256)")],
+                functionName: "intents",
+                args: [intentId],
+              }) as any[];
+              status = Number(intentData[7]);
+            } catch (e) {
+              console.error("Failed to read intent status", e);
+            }
+
+            return {
+              id: Number(intentId),
+              status: status,
+              tokenIn: log.args.tokenIn === TOKENS[0].address ? "WETH" : "USDC",
+              tokenOut: log.args.tokenOut === TOKENS[0].address ? "WETH" : "USDC",
+              time: "Recently", // Simplified
+            };
+          })
+        );
 
         setRecentIntents(intents.reverse().slice(0, 5));
         setPrivacyScore(intents.length > 0 ? 98 : 100);
@@ -105,9 +144,53 @@ export default function DashboardPage() {
         setIsLoading(false);
       }
     }
-
+    
     fetchDashboardData();
-  }, [address, showBalances]);
+  }, [address]);
+
+  const handleToggleDecrypt = async () => {
+    if (showBalances) {
+      setShowBalances(false);
+      return;
+    }
+    setIsDecrypting(true);
+    try {
+      let prices = { ethereum: { usd: 3500 }, 'usd-coin': { usd: 1 } };
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd");
+        if (res.ok) prices = await res.json();
+      } catch (e) {}
+
+      const { decryptHandle } = await import("@/lib/nox");
+      
+      const newItems = await Promise.all(
+        portfolioItems.map(async (item) => {
+          if (item.rawHandle) {
+            try {
+              const plaintextWei = await decryptHandle(item.rawHandle as `0x${string}`);
+              const floatValue = parseFloat(formatUnits(plaintextWei, item.token.decimals));
+              const decryptedBalance = floatValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+              
+              const price = item.token.symbol === "WETH" ? prices.ethereum.usd : prices['usd-coin'].usd;
+              const usdValue = `$${(floatValue * price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+              
+              return { ...item, decryptedBalance, usdValue };
+            } catch (e) {
+              return { ...item, decryptedBalance: "Decryption Failed" };
+            }
+          }
+          return item;
+        })
+      );
+      setPortfolioItems(newItems);
+      setShowBalances(true);
+    } catch (e) {
+      console.error(e);
+      alert("Decryption failed. Please sign the ACL request.");
+    } finally {
+      setIsDecrypting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -193,15 +276,18 @@ export default function DashboardPage() {
                     Encrypted Portfolio
                   </h2>
                   <button
-                    onClick={() => setShowBalances(!showBalances)}
-                    className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    onClick={handleToggleDecrypt}
+                    disabled={isDecrypting}
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
                   >
-                    {showBalances ? (
+                    {isDecrypting ? (
+                      <div className="w-4 h-4 rounded-full border-2 border-slate-400 border-t-slate-600 animate-spin" />
+                    ) : showBalances ? (
                       <EyeOff className="w-4 h-4" />
                     ) : (
                       <Eye className="w-4 h-4" />
                     )}
-                    {showBalances ? "Hide" : "Decrypt"}
+                    {isDecrypting ? "Decrypting..." : showBalances ? "Hide" : "Decrypt"}
                   </button>
                 </div>
 
