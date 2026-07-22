@@ -6,9 +6,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy:sepolia": "hardhat ignition deploy ./ignition/modules/Axi.ts --network sepolia",
-    "dev": "cd app && npm run dev",
-    "build": "cd app && npm run build"
+    "deploy:sepolia": "hardhat ignition deploy ./ignition/modules/Axi.ts --network sepolia"
   },
   "dependencies": {
     "@iexec-nox/nox-confidential-contracts": "latest",
