@@ -57,7 +57,7 @@ export default function SwapPage() {
 
       const publicClient = createPublicClient({
         chain: CHAIN,
-        transport: custom(window.ethereum),
+        transport: custom(window.ethereum!),
       });
 
       const extendedClient = publicClient.extend(publicActions);

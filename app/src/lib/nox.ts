@@ -30,7 +30,7 @@ export async function getWalletClient(): Promise<WalletClient> {
 
   const walletClient = createWalletClient({
     chain: CHAIN,
-    transport: custom(window.ethereum),
+    transport: custom(window.ethereum!),
   });
 
   // Request account access

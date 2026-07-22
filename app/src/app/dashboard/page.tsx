@@ -118,8 +118,8 @@ export default function DashboardPage() {
                 address: CONTRACTS.intentPool as `0x${string}`,
                 abi: [parseAbiItem("function intents(uint256) external view returns (uint256, address, uint8, address, address, uint256, uint256, uint8, uint256, uint256)")],
                 functionName: "intents",
-                args: [intentId],
-              }) as any[];
+                args: [intentId!],
+              }) as unknown as any[];
               status = Number(intentData[7]);
             } catch (e) {
               console.error("Failed to read intent status", e);

@@ -46,7 +46,7 @@ export default function VaultPage() {
       try {
         const walletClient = await getWalletClient();
         const [connectedAccount] = await walletClient.getAddresses();
-        const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+        const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum!) });
 
         const newEncrypted: Record<string, string> = {};
         for (const token of TOKENS) {
@@ -81,7 +81,7 @@ export default function VaultPage() {
     try {
       const walletClient = await getWalletClient();
       const [connectedAccount] = await walletClient.getAddresses();
-      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum!) });
       const { decryptHandle } = await import("@/lib/nox");
 
       const newDecrypted: Record<string, string> = {};
@@ -119,7 +119,7 @@ export default function VaultPage() {
     try {
       const walletClient = await getWalletClient();
       const [connectedAccount] = await walletClient.getAddresses();
-      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum!) });
       const amountWei = parseUnits(amount, selectedToken.decimals);
       
       // 1. Approve
@@ -170,7 +170,7 @@ export default function VaultPage() {
     try {
       const walletClient = await getWalletClient();
       const [connectedAccount] = await walletClient.getAddresses();
-      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum) });
+      const publicClient = createPublicClient({ chain: CHAIN, transport: custom(window.ethereum!) });
       const amountWei = parseUnits(amount, selectedToken.decimals);
       
       const { encryptAmount } = await import("@/lib/nox");
