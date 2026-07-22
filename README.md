@@ -1,6 +1,6 @@
 # Axi — Private DeFi Intent Router
 
-> Shield your DeFi trades from MEV and front-running. Route swaps and lending through iExec Nox confidential contracts without revealing your strategy.
+> Shield your DeFi trades from MEV and front-running. Axi provides the privacy of a Dark Pool by routing encrypted intents through the NOX Protocol and Intel SGX TEEs without ever revealing your strategy to the public mempool.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Network](https://img.shields.io/badge/network-Sepolia-purple)
@@ -15,11 +15,14 @@
 
 ##  What is Axi?
 
-Axi is a **privacy-first DeFi intent router** that leverages [iExec Nox](https://docs.iex.ec/axi-protocol/getting-started/welcome) confidential computing to protect users from MEV, front-running, and on-chain surveillance.
+Axi acts as a **Confidential, Intent-Based Dark Pool**, but operates technically as a **Confidential Router**. By leveraging Fully Homomorphic Encryption (FHE) via the [NOX Protocol](https://docs.iex.ec/axi-protocol/getting-started/welcome) and Intel SGX Trusted Execution Environments (TEEs), Axi completely encrypts your portfolio and your trades.
 
-**The Problem:** DeFi is transparent by default. Every swap amount, trading strategy, and portfolio position is visible to MEV bots who extract value by front-running and sandwiching trades.
+**The Problem:** DeFi is transparent by default. Every swap amount, trading strategy, and portfolio position is visible to MEV bots, front-runners, and sandwich attackers who extract billions of dollars in hidden slippage every year. Furthermore, on-chain wallets have zero privacy.
 
-**The Solution:** Axi encrypts your DeFi intents using Nox's Trusted Execution Environments (TEE). Your swap amounts are stored as encrypted `euint256` handles — nobody can see them. When enough intents accumulate, they're batched and executed as a single aggregated trade on Uniswap. Bots see one large trade; they can't extract value from individual users.
+**The Solution:** Axi guarantees mathematically that no one—not even block producers or MEV searchers—can see the size of your trade or your wallet balance. 
+- **Confidential Vaults:** Deposits are stored as encrypted `euint256` handles — nobody can see your balance. 
+- **Batch Auctions (The Magic):** When you submit an intent to swap, the amount is encrypted. An off-chain Relayer aggregates multiple users' intents into a single batch and sends them to a Secure TEE Enclave. The Enclave decrypts them in total isolation, calculates the aggregate volume, and executes a single massive bulk trade on Uniswap. 
+- **MEV-Proof:** Because individual trade sizes are perfectly obfuscated within the crowd, bots see one large aggregated trade and cannot extract value from individual users.
 
 ---
 
