@@ -15,7 +15,7 @@
 
 ##  What is Axi?
 
-Axi acts as a **Confidential, Intent-Based Dark Pool**, but operates technically as a **Confidential Router**. By leveraging Fully Homomorphic Encryption (FHE) via the [NOX Protocol](https://docs.iex.ec/axi-protocol/getting-started/welcome) and Intel SGX Trusted Execution Environments (TEEs), Axi completely encrypts your portfolio and your trades.
+Axi acts as a **Confidential, Intent-Based Dark Pool**, but operates technically as a **Confidential Router**. By leveraging Confidential Computing via the [NOX Protocol](https://docs.iex.ec/axi-protocol/getting-started/welcome) and Intel SGX Trusted Execution Environments (TEEs), Axi completely encrypts your portfolio and your trades.
 
 **The Problem:** DeFi is transparent by default. Every swap amount, trading strategy, and portfolio position is visible to MEV bots, front-runners, and sandwich attackers who extract billions of dollars in hidden slippage every year. Furthermore, on-chain wallets have zero privacy.
 
