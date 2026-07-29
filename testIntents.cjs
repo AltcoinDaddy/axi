@@ -1,6 +1,6 @@
 const { createPublicClient, http, parseAbiItem } = require('viem');
-const { arbitrumSepolia } = require('viem/chains');
-const client = createPublicClient({ chain: arbitrumSepolia, transport: http('https://sepolia-rollup.arbitrum.io/rpc') });
+const { sepolia } = require('viem/chains');
+const client = createPublicClient({ chain: sepolia, transport: http('https://ethereum-sepolia-rpc.publicnode.com') });
 
 async function check() {
   const logs = await client.getLogs({

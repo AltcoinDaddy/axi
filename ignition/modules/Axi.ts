@@ -1,6 +1,6 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-// Arbitrum Sepolia testnet addresses
+// Ethereum Sepolia testnet addresses
 const UNISWAP_V3_ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45";
 const AAVE_V3_POOL = "0x0000000000000000000000000000000000000001"; // Placeholder
 const WETH = "0x980B62Da83eFf3D4576C647993b0c1D7faf17c73";
