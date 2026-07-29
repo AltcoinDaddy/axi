@@ -21,12 +21,6 @@ export default defineConfig({
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
     },
-    arbitrumSepolia: {
-      type: "http",
-      url: process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
-    },
+
   },
 });

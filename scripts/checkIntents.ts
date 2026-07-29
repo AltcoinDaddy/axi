@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
 import { parseAbiItem, createPublicClient, http } from "viem";
-import { arbitrumSepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 
 dotenv.config();
 
 async function main() {
-  const publicClient = createPublicClient({ chain: arbitrumSepolia, transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL) });
+  const publicClient = createPublicClient({ chain: sepolia, transport: http(process.env.SEPOLIA_RPC_URL) });
   const intentPoolAddress = process.env.NEXT_PUBLIC_INTENT_POOL_ADDRESS as `0x${string}`;
   
   for (let i = 0n; i < 2n; i++) {

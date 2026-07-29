@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { parseAbiItem, createPublicClient, createWalletClient, http, publicActions, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { arbitrumSepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { createViemHandleClient } from "@iexec-nox/handle";
 
 dotenv.config();
@@ -12,8 +12,8 @@ async function main() {
   const intentPoolAddress = process.env.NEXT_PUBLIC_INTENT_POOL_ADDRESS as `0x${string}`;
   
   const account = privateKeyToAccount(privateKey);
-  const publicClient = createPublicClient({ chain: arbitrumSepolia, transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL) });
-  const walletClient = createWalletClient({ chain: arbitrumSepolia, transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL), account }).extend(publicActions);
+  const publicClient = createPublicClient({ chain: sepolia, transport: http(process.env.SEPOLIA_RPC_URL) });
+  const walletClient = createWalletClient({ chain: sepolia, transport: http(process.env.SEPOLIA_RPC_URL), account }).extend(publicActions);
 
   console.log("🕵️ Relayer Started");
   console.log("Scanning Confidential Intent Pool for pending batches...");

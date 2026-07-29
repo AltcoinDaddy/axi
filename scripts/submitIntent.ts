@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { parseAbiItem, createPublicClient, createWalletClient, http, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { arbitrumSepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { createViemHandleClient } from "@iexec-nox/handle";
 
 dotenv.config();
@@ -24,13 +24,13 @@ async function main() {
   console.log(`Using account: ${account.address}`);
 
   const publicClient = createPublicClient({
-    chain: arbitrumSepolia,
-    transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL)
+    chain: sepolia,
+    transport: http(process.env.SEPOLIA_RPC_URL)
   });
 
   const walletClient = createWalletClient({
-    chain: arbitrumSepolia,
-    transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL),
+    chain: sepolia,
+    transport: http(process.env.SEPOLIA_RPC_URL),
     account
   }).extend(publicActions);
 

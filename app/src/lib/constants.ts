@@ -1,10 +1,10 @@
-import { arbitrumSepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 
 // ─── Network Configuration ─────────────────────────────────────
-export const CHAIN = arbitrumSepolia;
-export const CHAIN_ID = arbitrumSepolia.id;
+export const CHAIN = sepolia;
+export const CHAIN_ID = sepolia.id;
 export const RPC_URL =
-  process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL ||
+  process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL ||
   "https://sepolia-rollup.arbitrum.io/rpc";
 
 // ─── Contract Addresses (Sepolia) ───────────────────────────────
