@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { parseAbiItem, createPublicClient, createWalletClient, http, publicActions } from "viem";
+import { parseAbiItem, createPublicClient, createWalletClient, http, publicActions, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { createViemHandleClient } from "@iexec-nox/handle";
@@ -39,7 +39,7 @@ async function main() {
   const noxClient = await createViemHandleClient(walletClient);
   
   // Encrypt 1 WETH (1e18) for the intent pool
-  const amountToEncrypt = BigInt(1000000000000000000); // 1 ETH/WETH
+  const amountToEncrypt = parseEther("0.005");
   const result = await noxClient.encryptInput(amountToEncrypt, "uint256", intentPoolAddress);
   
   const handle = result.handle as `0x${string}`;

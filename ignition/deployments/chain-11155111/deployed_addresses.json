@@ -1,0 +1,7 @@
+{
+  "AxiModule#AxiRouter": "0x20492175b360422fAFC221FEE8F10F2E94C601bE",
+  "AxiModule#WrappedConfidentialETH": "0x84ae3aCd0Ce96f9c18CBDfc524e5cb6E4cf77A52",
+  "AxiModule#WrappedConfidentialUSDC": "0x119bceB2e48aE03d6A4346a362426c6063c7b247",
+  "AxiModule#AxiVault": "0x9BfFE60ebE1C5d818e983308FD7EFd899B0024F8",
+  "AxiModule#ConfidentialIntentPool": "0x0b0f3189f10D3D695858f7975507Ce729a6632a4"
+}
