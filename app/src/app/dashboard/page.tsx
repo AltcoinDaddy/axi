@@ -101,12 +101,17 @@ export default function DashboardPage() {
         setPortfolioItems(items);
 
         // 2. Fetch Recent Intents
-        // For real intents, we fetch IntentSubmitted events
+        // To avoid the 10,000 block limit on free RPCs, we dynamically calculate the fromBlock
+        const currentBlock = await publicClient.getBlockNumber();
+        const safeFromBlock = currentBlock - 9500n; // Stay safely under the 10k limit
+        const envBlock = BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK_NUMBER || "289000000");
+        const fromBlock = envBlock > safeFromBlock ? envBlock : safeFromBlock;
+
         const logs = await publicClient.getLogs({
           address: CONTRACTS.intentPool,
           event: parseAbiItem('event IntentSubmitted(uint256 indexed intentId, address indexed user, uint8 intentType, address tokenIn, address tokenOut, uint256 deadline)'),
           args: { user: address as `0x${string}` },
-          fromBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK_NUMBER || "289000000"),
+          fromBlock: fromBlock,
         });
 
         const intents = await Promise.all(
