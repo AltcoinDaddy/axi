@@ -172,16 +172,8 @@ export default function DashboardPage() {
         portfolioItems.map(async (item) => {
           if (item.rawHandle) {
             try {
-              // FOR HACKATHON DEMO: Trigger MetaMask signature to simulate NOX ACL Enclave authorization
-              const walletClient = await getWalletClient();
-              const [connectedAccount] = await walletClient.getAddresses();
-              await walletClient.signMessage({
-                account: connectedAccount,
-                message: "Axi: Authorize NOX Enclave Decryption for Handle " + item.rawHandle,
-              });
-
-              // Our mock Vault returns the raw balance formatted as a hex handle, so we just convert it back
-              const plaintextWei = BigInt(item.rawHandle);
+              // Our Vault returns a real Nox handle, so we decrypt it securely via the iExec Nox Enclave
+              const plaintextWei = await decryptHandle(item.rawHandle as `0x${string}`);
               const floatValue = parseFloat(formatUnits(plaintextWei, item.token.decimals));
               const decryptedBalance = floatValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
               
