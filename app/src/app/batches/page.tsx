@@ -54,8 +54,8 @@ export default function BatchesPage() {
             const block = await publicClient.getBlock({ blockHash: log.blockHash });
             return {
               id: Number(log.args.batchId),
-              tokenIn: log.args.tokenIn === TOKENS[0].address ? "WETH" : "USDC",
-              tokenOut: log.args.tokenOut === TOKENS[0].address ? "WETH" : "USDC",
+              tokenIn: log.args.tokenIn.toLowerCase() === TOKENS[0].address.toLowerCase() ? "WETH" : "USDC",
+              tokenOut: log.args.tokenOut.toLowerCase() === TOKENS[0].address.toLowerCase() ? "WETH" : "USDC",
               intentCount: Number(log.args.intentCount),
               status: "executed",
               createdAt: new Date(Number(block.timestamp) * 1000).toISOString(),
