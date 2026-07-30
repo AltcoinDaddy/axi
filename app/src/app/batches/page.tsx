@@ -231,7 +231,7 @@ export default function BatchesPage() {
                           </p>
                           {batch.txHash && (
                             <a
-                              href={`https://sepolia.arbiscan.io/tx/${batch.txHash}`}
+                              href={`https://sepolia.etherscan.io/tx/${batch.txHash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-500 hover:text-blue-600 hover:underline mt-1 transition-colors"

@@ -317,12 +317,12 @@ export default function SwapPage() {
               {txHash && (
                 <div className="text-center mt-4">
                   <a
-                    href={`https://sepolia.arbiscan.io/tx/${txHash}`}
+                    href={`https://sepolia.etherscan.io/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-500 hover:text-blue-600 hover:underline"
                   >
-                    View Transaction on Arbiscan <ExternalLink className="w-3.5 h-3.5" />
+                    View Transaction on Etherscan <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               )}
