@@ -192,8 +192,9 @@ export default function SwapPage() {
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   You pay
                 </span>
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Balance: ---
+                <span className="flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <Lock className="w-3 h-3 text-blue-400" />
+                  Balance Hidden
                 </span>
               </div>
               <div className="flex items-center gap-3">
@@ -230,8 +231,9 @@ export default function SwapPage() {
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   You receive
                 </span>
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Balance: ---
+                <span className="flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <Lock className="w-3 h-3 text-blue-400" />
+                  Balance Hidden
                 </span>
               </div>
               <div className="flex items-center gap-3">
