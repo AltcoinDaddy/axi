@@ -133,9 +133,10 @@ export default function VaultPage() {
       const approveHash = await walletClient.writeContract(approveReq);
       
       try {
-        await publicClient.waitForTransactionReceipt({ hash: approveHash, timeout: 6000 });
+        await publicClient.waitForTransactionReceipt({ hash: approveHash });
       } catch (e) {
-        console.warn("Approve receipt timeout, proceeding anyway:", e);
+        console.warn("Approve receipt failed:", e);
+        throw new Error("Approval failed to confirm.");
       }
       
       // 2. Deposit
